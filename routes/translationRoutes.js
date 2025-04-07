@@ -6,7 +6,8 @@ const translationController = require('../controllers/translationController');
 
 const upload = multer();
 
-router.post('/translate/text', auth, translationController.translateText);
-router.post('/translate/audio', auth, upload.single('file'), translationController.translateAudio);
+// Fixed route paths
+router.post('/text', auth, translationController.translateText);
+router.post('/audio', auth, upload.single('file'), translationController.translateAudio);
 
 module.exports = router;
