@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { OpenAI } = require('openai');
-const { toFile } = require('openai');
+const { OpenAI, toFile } = require('openai');
 const User = require('../models/User');
 const TokenLog = require('../models/TokenLog');
 const { Readable } = require('stream');
@@ -62,22 +61,23 @@ exports.translateAudio = async (req, res) => {
       return res.status(400).json({ error: 'Insufficient tokens' });
     }
 
-    // Convert buffer to File object using OpenAI's utility
+    // Convert buffer to a File object
     const file = await toFile(
       req.file.buffer,
-      req.file.originalname || 'audio.wav' // fallback name
+      req.file.originalname || 'audio.wav'
     );
 
-    // Transcribe with Whisper (audio → English text)
-    const whisperResponse = await openai.audio.translations.create({
+    // Step 1: Transcribe to English using Whisper
+    const transcription = await openai.audio.translations.create({
       file,
       model: 'whisper-1'
     });
 
-    const englishText = whisperResponse.text;
+    const englishText = transcription.text;
+    console.log("📝 Transcription:", englishText);
 
-    // Translate with GPT-4
-    const gptResponse = await openai.chat.completions.create({
+    // Step 2: Translate with GPT-4o
+    const translationResponse = await openai.chat.completions.create({
       model: 'gpt-4o',
       messages: [
         { role: 'system', content: `Translate the following to ${targetLanguage}` },
@@ -85,20 +85,35 @@ exports.translateAudio = async (req, res) => {
       ]
     });
 
-    const translatedText = gptResponse.choices[0].message.content;
+    const translatedText = translationResponse.choices[0].message.content.trim();
+    console.log("🌐 Translated:", translatedText);
 
-    // Deduct tokens
-    await User.findByIdAndUpdate(user._id, { $inc: { tokenBalance: -process.env.TOKENS_PER_AUDIO } });
+    // Step 3: Convert translated text to speech
+    const ttsResponse = await openai.audio.speech.create({
+      model: 'tts-1',
+      voice: 'nova', // You can change voice to: alloy, echo, fable, shimmer, etc.
+      input: translatedText,
+      response_format: "mp3"
+    });
+
+    const audioBuffer = Buffer.from(await ttsResponse.arrayBuffer());
+
+    // Step 4: Token deduction
+    await User.findByIdAndUpdate(user._id, {
+      $inc: { tokenBalance: -process.env.TOKENS_PER_AUDIO }
+    });
+
     await TokenLog.create({
       user: user._id,
       action: 'audio_translation',
       tokensDeducted: process.env.TOKENS_PER_AUDIO
     });
 
-    res.json({
-      original_text: englishText,
-      translated_text: translatedText
-    });
+    // Step 5: Send MP3 response
+    res.setHeader('Content-Type', 'audio/mpeg');
+    res.setHeader('Content-Disposition', 'attachment; filename="translated.mp3"');
+    res.send(audioBuffer);
+
   } catch (error) {
     console.error('Audio translation error:', error);
     res.status(500).send({ error: error.message });
