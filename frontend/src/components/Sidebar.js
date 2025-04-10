@@ -1,5 +1,4 @@
 // frontend/components/Sidebar.js
-
 import React from 'react';
 
 const Sidebar = ({ activePage, setActivePage }) => {
@@ -17,6 +16,13 @@ const Sidebar = ({ activePage, setActivePage }) => {
           onClick={() => setActivePage('users')}
         >
           User Management
+        </li>
+        {/* New list item for OpenAI settings */}
+        <li 
+          className={activePage === 'openai' ? 'active' : ''}
+          onClick={() => setActivePage('openai')}
+        >
+          OpenAI Settings
         </li>
       </ul>
       <button className="logout-btn" onClick={handleLogout}>

@@ -1,15 +1,16 @@
-import React, { useEffect, useState } from 'react';
+// frontend/pages/Dashboard.js
+import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
-import { FaUsers, FaUserShield } from 'react-icons/fa'; // Icons for user/admin cards
-import UserList from '../components/UserList'; // Your component to show user list
-import axiosInstance from '../api/axiosConfig'; // To fetch the user counts
+import { FaUsers, FaUserShield } from 'react-icons/fa';
+import UserList from '../components/UserList';
+import axiosInstance from '../api/axiosConfig';
+import OpenAiSettings from './OpenAiSettings'; // Import the new component
 
 const Dashboard = () => {
-  const [activePage, setActivePage] = useState("users"); // Keeps track of the active page (users or admins)
-  const [userCount, setUserCount] = useState(0); // To store total users count
-  const [adminCount, setAdminCount] = useState(0); // To store total admins count
+  const [activePage, setActivePage] = useState("users");
+  const [userCount, setUserCount] = useState(0);
+  const [adminCount, setAdminCount] = useState(0);
 
-  // Fetch user counts when component mounts
   useEffect(() => {
     const fetchUserCounts = async () => {
       try {
@@ -24,57 +25,75 @@ const Dashboard = () => {
         console.error("Error fetching user counts:", error);
       }
     };
-    fetchUserCounts();
-  }, []);
+    // Only fetch counts if we're on a page that needs them.
+    // (Alternatively, you could always fetch, but it’s unnecessary for the openai page.)
+    if (activePage !== 'openai') {
+      fetchUserCounts();
+    }
+  }, [activePage]);
 
   return (
     <div className="dashboard-container">
-      {/* Pass setActivePage as a prop to Sidebar */}
       <Sidebar activePage={activePage} setActivePage={setActivePage} />
       
       <div className="dashboard-content">
-        <h1>Dashboard</h1>
-        {/* Stats Cards Container */}
-        <div className="stats-grid" style={{ marginBottom: '20px' }}>
-          {/* Users Card */}
-          <div
-            className="stats-card"
-            style={{ cursor: 'pointer' }}
-            onClick={() => setActivePage("users")}
-          >
-            <div className="stats-icon purple-bg">
-              <FaUsers />
-            </div>
-            <div className="stats-text">
-              <h3>{userCount}</h3>
-              <span>Users</span>
-            </div>
-          </div>
-          {/* Admins Card */}
-          <div
-            className="stats-card"
-            style={{ cursor: 'pointer' }}
-            onClick={() => setActivePage("admins")}
-          >
-            <div className="stats-icon pink-bg">
-              <FaUserShield />
-            </div>
-            <div className="stats-text">
-              <h3>{adminCount}</h3>
-              <span>Admins</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Heading to indicate current view */}
-        {activePage === "users" ? (
-          <h2>All Registered Users</h2>
+        {/* Show different headings depending on the active page */}
+        {activePage === "openai" ? (
+          <>
+            <h1>OpenAI API Settings</h1>
+            <OpenAiSettings />
+          </>
         ) : (
-          <h2>Admin Users</h2>
-        )}
+          <>
+            <h1>Dashboard</h1>
 
-        {/* Render UserList with activePage prop */}
-        <UserList activeCard={activePage} />
+            {/* Stats grid: only shown if active page is not "openai" */}
+            <div className="stats-grid" style={{ marginBottom: '20px' }}>
+              {/* Users Card */}
+              <div
+                className="stats-card"
+                style={{ cursor: 'pointer' }}
+                onClick={() => setActivePage("users")}
+              >
+                <div className="stats-icon purple-bg">
+                  <FaUsers />
+                </div>
+                <div className="stats-text">
+                  <h3>{userCount}</h3>
+                  <span>Users</span>
+                </div>
+              </div>
+              {/* Admins Card */}
+              <div
+                className="stats-card"
+                style={{ cursor: 'pointer' }}
+                onClick={() => setActivePage("admins")}
+              >
+                <div className="stats-icon pink-bg">
+                  <FaUserShield />
+                </div>
+                <div className="stats-text">
+                  <h3>{adminCount}</h3>
+                  <span>Admins</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Render the user list for "users" or "admins" */}
+            {activePage === "users" && (
+              <>
+                <h2>All Registered Users</h2>
+                <UserList activeCard="users" />
+              </>
+            )}
+            {activePage === "admins" && (
+              <>
+                <h2>Admin Users</h2>
+                <UserList activeCard="admins" />
+              </>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

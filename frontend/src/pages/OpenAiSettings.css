@@ -1,0 +1,67 @@
+/* frontend/pages/OpenAiSettings.css */
+
+.openai-settings-container {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+  }
+  
+  .openai-message {
+    color: #2f3e46; /* or red/green depending on success or error */
+    margin-bottom: 15px;
+    font-weight: 600;
+  }
+  
+  .openai-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .openai-input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .openai-btn {
+    background: #5563DE;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .openai-btn:hover {
+    background: #4454c4;
+  }
+  
+  .api-key-display {
+    margin-top: 10px;
+  }
+  
+  .api-key-display strong {
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  .api-key-box {
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 4px;
+    word-wrap: break-word;       /* This ensures the text wraps */
+    overflow-wrap: break-word;   /* Chrome, Safari, Edge, Opera */
+    max-height: 100px;           /* limit the height if needed */
+    overflow-y: auto;            /* scroll if it's too long */
+    font-family: monospace;
+    font-size: 0.95rem;
+    color: #333;
+  }
+  

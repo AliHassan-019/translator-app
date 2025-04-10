@@ -261,3 +261,28 @@ html,
 .user-list tr:last-child td {
   border-bottom: none;
 }
+
+/* Example additions in App.css */
+.openai-settings {
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+  max-width: 600px;
+  margin: 20px auto;
+}
+
+.openai-settings h2 {
+  margin-bottom: 20px;
+}
+
+.openai-settings form div {
+  margin-bottom: 15px;
+}
+
+.openai-settings input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
