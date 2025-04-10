@@ -1,3 +1,5 @@
+// frontend/components/Sidebar.js
+
 import React from 'react';
 
 const Sidebar = ({ activePage, setActivePage }) => {
@@ -12,7 +14,7 @@ const Sidebar = ({ activePage, setActivePage }) => {
       <ul className="sidebar-menu">
         <li 
           className={activePage === 'users' ? 'active' : ''}
-          onClick={() => setActivePage('users')} // Update active page on click
+          onClick={() => setActivePage('users')}
         >
           User Management
         </li>
