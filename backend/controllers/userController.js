@@ -3,7 +3,7 @@
 const User = require('../models/User');
 const TokenLog = require('../models/TokenLog');
 
-// Fetch user details, including token consumption and join date
+// Fetch user details, including token consumption
 exports.getUserDetails = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -18,13 +18,11 @@ exports.getUserDetails = async (req, res) => {
     ]);
 
     const totalTokensConsumed = tokenLogs.length ? tokenLogs[0].totalTokens : 0;
-    const joinDate = user.createdAt;
 
     res.json({
       username: user.username,
       tokenBalance: user.tokenBalance,
-      totalTokensConsumed,
-      joinDate
+      totalTokensConsumed
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

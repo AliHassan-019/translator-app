@@ -22,7 +22,7 @@ const UserList = ({ activeCard }) => {
     fetchUsers();
   }, []);
 
-  // Fetch additional user details (tokens consumed and join date)
+  // Fetch additional user details (tokens consumed)
   const fetchUserDetails = async (userId) => {
     try {
       const response = await axiosInstance.get(`/users/${userId}`);
@@ -71,7 +71,6 @@ const UserList = ({ activeCard }) => {
                 <th>Role</th>
                 <th>Token Balance</th>
                 <th>Total Tokens Consumed</th>
-                <th>Join Date</th>
                 <th>Actions</th>
               </tr>
             )}
@@ -88,11 +87,6 @@ const UserList = ({ activeCard }) => {
                     </td>
                     <td>
                       {userDetails[user._id]?.totalTokensConsumed || 'Loading...'}
-                    </td>
-                    <td>
-                      {userDetails[user._id]?.joinDate
-                        ? new Date(userDetails[user._id].joinDate).toLocaleDateString()
-                        : 'Loading...'}
                     </td>
                     <td>
                       {editingUserId === user._id ? (
