@@ -12,7 +12,7 @@ const Sidebar = ({ activePage, setActivePage }) => {
       <ul className="sidebar-menu">
         <li 
           className={activePage === 'users' ? 'active' : ''}
-          onClick={() => setActivePage('users')}
+          onClick={() => setActivePage('users')} // Update active page on click
         >
           User Management
         </li>

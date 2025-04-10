@@ -1,37 +1,37 @@
 import React, { useEffect, useState } from 'react';
-import axiosInstance from '../api/axiosConfig';
 import Sidebar from '../components/Sidebar';
-import { FaUsers, FaUserShield } from 'react-icons/fa'; // Icons for card visuals
-import UserList from '../components/UserList';
+import { FaUsers, FaUserShield } from 'react-icons/fa'; // Icons for user/admin cards
+import UserList from '../components/UserList'; // Your component to show user list
+import axiosInstance from '../api/axiosConfig'; // To fetch the user counts
 
 const Dashboard = () => {
-  // activeCard: "users" shows all users; "admins" shows only admin users.
-  const [activeCard, setActiveCard] = useState("users");
-  
-  // State for maintaining user counts (all and admin)
-  const [userCount, setUserCount] = useState(0);
-  const [adminCount, setAdminCount] = useState(0);
+  const [activePage, setActivePage] = useState("users"); // Keeps track of the active page (users or admins)
+  const [userCount, setUserCount] = useState(0); // To store total users count
+  const [adminCount, setAdminCount] = useState(0); // To store total admins count
 
-  // Fetch users to compute counts, so we use them in our cards
+  // Fetch user counts when component mounts
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchUserCounts = async () => {
       try {
         const response = await axiosInstance.get('/admin/users');
         const allUsers = response.data;
-        const totalUsers = allUsers.filter(u => u.role === 'user').length;
-        const totalAdmins = allUsers.filter(u => u.role === 'admin').length;
+        const totalUsers = allUsers.filter(user => user.role === 'user').length;
+        const totalAdmins = allUsers.filter(user => user.role === 'admin').length;
+
         setUserCount(totalUsers);
         setAdminCount(totalAdmins);
       } catch (error) {
         console.error("Error fetching user counts:", error);
       }
     };
-    fetchUsers();
+    fetchUserCounts();
   }, []);
 
   return (
     <div className="dashboard-container">
-      <Sidebar />
+      {/* Pass setActivePage as a prop to Sidebar */}
+      <Sidebar activePage={activePage} setActivePage={setActivePage} />
+      
       <div className="dashboard-content">
         <h1>Dashboard</h1>
         {/* Stats Cards Container */}
@@ -40,7 +40,7 @@ const Dashboard = () => {
           <div
             className="stats-card"
             style={{ cursor: 'pointer' }}
-            onClick={() => setActiveCard("users")}
+            onClick={() => setActivePage("users")}
           >
             <div className="stats-icon purple-bg">
               <FaUsers />
@@ -54,7 +54,7 @@ const Dashboard = () => {
           <div
             className="stats-card"
             style={{ cursor: 'pointer' }}
-            onClick={() => setActiveCard("admins")}
+            onClick={() => setActivePage("admins")}
           >
             <div className="stats-icon pink-bg">
               <FaUserShield />
@@ -67,14 +67,14 @@ const Dashboard = () => {
         </div>
 
         {/* Heading to indicate current view */}
-        {activeCard === "users" ? (
+        {activePage === "users" ? (
           <h2>All Registered Users</h2>
         ) : (
           <h2>Admin Users</h2>
         )}
 
-        {/* Render UserList with activeCard prop */}
-        <UserList activeCard={activeCard} />
+        {/* Render UserList with activePage prop */}
+        <UserList activeCard={activePage} />
       </div>
     </div>
   );
