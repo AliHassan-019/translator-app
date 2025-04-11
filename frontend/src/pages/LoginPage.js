@@ -1,3 +1,4 @@
+// frontend/src/pages/LoginPage.js
 import React, { useState } from 'react';
 import axiosInstance from '../api/axiosConfig';
 import { useNavigate } from 'react-router-dom';
@@ -10,13 +11,21 @@ const LoginPage = () => {
   const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
 
-  const handleToggleShowPassword = () => setShowPassword((prev) => !prev);
+  const handleToggleShowPassword = () => setShowPassword(prev => !prev);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     try {
       const response = await axiosInstance.post('/auth/login', { username, password });
+      // Although the backend now enforces the admin check,
+      // we add a redundant check here for added safety.
+      if (response.data.user.role !== 'admin') {
+         setErrorMsg('Access denied: Only admin accounts can log in.');
+         return;
+      }
+      // Save token and user info to localStorage
       localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
       navigate('/dashboard');
     } catch (error) {
       setErrorMsg('Invalid credentials or server error.');
