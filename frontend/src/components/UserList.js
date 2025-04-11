@@ -1,5 +1,4 @@
-// frontend/components/UserList.js
-
+// frontend/src/components/UserList.js
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../api/axiosConfig';
 import UpdateTokensForm from './UpdateTokensForm';
@@ -8,7 +7,6 @@ const UserList = ({ activeCard }) => {
   const [users, setUsers] = useState([]);
   const [fetchError, setFetchError] = useState('');
   const [editingUserId, setEditingUserId] = useState(null);
-  const [userDetails, setUserDetails] = useState({});
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -22,28 +20,11 @@ const UserList = ({ activeCard }) => {
     fetchUsers();
   }, []);
 
-  // Fetch additional user details (tokens consumed)
-  const fetchUserDetails = async (userId) => {
-    try {
-      const response = await axiosInstance.get(`/users/${userId}`);
-      setUserDetails(prevState => ({
-        ...prevState,
-        [userId]: response.data
-      }));
-    } catch (error) {
-      console.error("Error fetching user details:", error);
-    }
-  };
-
-  const handleUserClick = (userId) => {
-    fetchUserDetails(userId); // Fetch details for the clicked user
-  };
-
-  // Filter: for "admins", show only admin users; for "users", show only non-admins
+  // Filter for "admins" or "users"
   const filteredUsers =
-    activeCard === "admins"
-      ? users.filter(user => user.role === "admin")
-      : users.filter(user => user.role !== "admin");
+    activeCard === 'admins'
+      ? users.filter(user => user.role === 'admin')
+      : users.filter(user => user.role !== 'admin');
 
   const handleTokenUpdate = (updatedUser) => {
     setUsers(prevUsers =>
@@ -60,7 +41,7 @@ const UserList = ({ activeCard }) => {
       ) : (
         <table>
           <thead>
-            {activeCard === "admins" ? (
+            {activeCard === 'admins' ? (
               <tr>
                 <th>Name</th>
                 <th>Role</th>
@@ -77,25 +58,27 @@ const UserList = ({ activeCard }) => {
           </thead>
           <tbody>
             {filteredUsers.map(user => (
-              <tr key={user._id} onClick={() => handleUserClick(user._id)}>
+              <tr key={user._id}>
                 <td>{user.username}</td>
                 <td>{user.role}</td>
-                {activeCard !== "admins" && (
+                {activeCard !== 'admins' && (
                   <>
                     <td style={{ fontWeight: 'bold', color: '#2a9d8f' }}>
                       {user.tokenBalance}
                     </td>
                     <td>
-                      {userDetails[user._id]?.totalTokensConsumed || 'Loading...'}
+                      {user.totalTokensConsumed !== undefined
+                        ? user.totalTokensConsumed
+                        : 'Loading...'}
                     </td>
                     <td>
                       {editingUserId === user._id ? (
-                        <UpdateTokensForm 
-                          userId={user._id} 
-                          onUpdate={handleTokenUpdate} 
+                        <UpdateTokensForm
+                          userId={user._id}
+                          onUpdate={handleTokenUpdate}
                         />
                       ) : (
-                        <button 
+                        <button
                           onClick={() => setEditingUserId(user._id)}
                           style={{
                             background: '#2f3e46',
